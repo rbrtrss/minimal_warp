@@ -70,12 +70,20 @@ struct Pagination {
     end: usize,
 }
 
-fn extract_pagination(params: HashMap<String,String>) -> Result<Pagination, Error> {
+fn extract_pagination(params: HashMap<String,String>, store: Store) -> Result<Pagination, Error> {
     if params.contains_key("start") && params.contains_key("end") {
-    return Ok(Pagination { 
+    let pagination = Pagination { 
         start: params.get("start").unwrap().parse::<usize>().map_err(Error::ParseError)?,
         end: params.get("end").unwrap().parse::<usize>().map_err(Error::ParseError)?,
-    });
+    };
+    if pagination.start > store.questions.len() || pagination.end > store.questions.len() {
+        // println!("{}, {}", pagination.end, params.len());
+        return Err(Error::OutOfBounds);
+    } else if pagination.start > pagination.end {
+        return Err(Error::WrongRange);
+    } else {
+        return Ok(pagination);
+    }
     }
     Err(Error::MissingParameters)
 }
@@ -94,22 +102,22 @@ fn extract_pagination(params: HashMap<String,String>) -> Result<Pagination, Erro
 // struct InvalidId;
 // impl Reject for InvalidId {}
 
-fn extract_questions(pagination: Pagination, store: Store) -> Result<&[Question], Error> {
-        if pagination.start > store.questions.len() || pagination.end > store.questions.len() {
-            // println!("{}, {}", pagination.end, params.len());
-            return Err(Error::OutOfBounds);
-        } else if pagination.start > pagination.end {
-            return Err(Error::WrongRange);
-        } else {
-            let res: Vec<Question> = store.questions.values().cloned().collect();
-            let res = &res[pagination.start..pagination.end];
-            return Ok(res)
-        }
-}
+// fn extract_questions(pagination: Pagination, store: Store) -> Result<&[Question], Error> {
+//         if pagination.start > store.questions.len() || pagination.end > store.questions.len() {
+//             // println!("{}, {}", pagination.end, params.len());
+//             return Err(Error::OutOfBounds);
+//         } else if pagination.start > pagination.end {
+//             return Err(Error::WrongRange);
+//         } else {
+//             let res: Vec<Question> = store.questions.values().cloned().collect();
+//             let res = &res[pagination.start..pagination.end];
+//             return Ok(res)
+//         }
+// }
 
 async fn get_questions(params: HashMap<String,String>,store: Store) -> Result<impl Reply, Rejection> {
     if !params.is_empty() {
-        let pagination = extract_pagination(params)?;
+        let pagination = extract_pagination(params, store.clone())?;
         let res: Vec<Question> = store.questions.values().cloned().collect();
         let res = &res[pagination.start..pagination.end];
         Ok(warp::reply::json(&res))
