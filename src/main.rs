@@ -261,7 +261,7 @@ async fn delete_question(
         .questions
         .write()
         .await
-        .get_mut(&QuestionId(id)) {
+        .remove(&QuestionId(id)) {
             Some(_) => {
                 return Ok(warp::reply::with_status(
                     "Question Deleted",
