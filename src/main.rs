@@ -3,20 +3,47 @@ use std::{
     // io::{Error, ErrorKind},
     // str::FromStr,
     collections::HashMap,
-    sync::Arc,
 };
-use tokio::sync::RwLock;
 use warp::{
-    body::BodyDeserializeError,
-    cors::CorsForbidden,
     http::Method,
     http::StatusCode,
-    reject::Reject,
-    // reject::Reject,
     Filter,
     Rejection,
     Reply,
 };
+mod error;
+use error::Error;
+
+mod store {
+    use tokio::sync::RwLock;
+    use std::sync::Arc;
+    use std::collections::HashMap;
+
+    #[derive(Clone)]
+    struct Store {
+        questions: Arc<RwLock<HashMap<QuestionId, Question>>>,
+        answers: Arc<RwLock<HashMap<AnswerId, Answer>>>,
+    }
+    
+    impl Store {
+        fn new() -> Self {
+            Store {
+                questions: Arc::new(RwLock::new(Self::init())),
+                answers: Arc::new(RwLock::new(HashMap::new())),
+            }
+        }
+    
+        fn init() -> HashMap<QuestionId, Question> {
+            let file = include_str!("../questions.json");
+            serde_json::from_str(file).expect("cannot read questions.json")
+        }
+    
+        // fn add_question(mut self, question: Question) -> Self {
+        //     self.questions.insert(question.id.clone(), question);
+        //     self
+        // }
+    }
+}
 
 // ch02/src/main.rs
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -51,38 +78,7 @@ struct Answer {
 #[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone)]
 struct AnswerId(String);
 
-#[derive(Debug)]
-enum Error {
-    ParseError(std::num::ParseIntError),
-    MissingParameters,
-    OutOfBounds,
-    WrongRange,
-    QuestionNotFound,
-}
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            Error::ParseError(ref err) => {
-                write!(f, "Cannot parse parameters {}", err)
-            }
-            Error::MissingParameters => {
-                write!(f, "Missing parameter")
-            }
-            Error::OutOfBounds => {
-                write!(f, "Requested index are out of bounds")
-            }
-            Error::WrongRange => {
-                write!(f, "Wrong range")
-            }
-            Error::QuestionNotFound => {
-                write!(f, "Question does not exist")
-            }
-        }
-    }
-}
-
-impl Reject for Error {}
 
 #[derive(Debug)]
 struct Pagination {
@@ -185,55 +181,9 @@ async fn get_questions(
     // Ok(warp::reply::json(&res))
 }
 
-async fn return_error(r: Rejection) -> Result<impl Reply, Rejection> {
-    // println!("{:?}", r);
-    if let Some(error) = r.find::<Error>() {
-        Ok(warp::reply::with_status(
-            error.to_string(),
-            StatusCode::INTERNAL_SERVER_ERROR,
-        ))
-    } else if let Some(error) = r.find::<CorsForbidden>() {
-        Ok(warp::reply::with_status(
-            error.to_string(),
-            StatusCode::FORBIDDEN,
-        ))
-    } else if let Some(error) = r.find::<BodyDeserializeError>() {
-        Ok(warp::reply::with_status(
-            error.to_string(),
-            StatusCode::UNPROCESSABLE_ENTITY,
-        ))
-    } else {
-        Ok(warp::reply::with_status(
-            "Route not found".to_string(),
-            StatusCode::NOT_FOUND,
-        ))
-    }
-}
 
-#[derive(Clone)]
-struct Store {
-    questions: Arc<RwLock<HashMap<QuestionId, Question>>>,
-    answers: Arc<RwLock<HashMap<AnswerId, Answer>>>,
-}
 
-impl Store {
-    fn new() -> Self {
-        Store {
-            questions: Arc::new(RwLock::new(Self::init())),
-            answers: Arc::new(RwLock::new(HashMap::new())),
-        }
-    }
 
-    fn init() -> HashMap<QuestionId, Question> {
-        let file = include_str!("../questions.json");
-        serde_json::from_str(file).expect("cannot read questions.json")
-    }
-
-    // fn add_question(mut self, question: Question) -> Self {
-    //     self.questions.insert(question.id.clone(), question);
-    //     self
-    // }
-}
 
 async fn add_question(store: Store, question: Question) -> Result<impl Reply, Rejection> {
     store
@@ -333,7 +283,7 @@ async fn main() {
         .or(delete_questions)
         .or(add_answer)
         .with(cors)
-        .recover(return_error);
+        .recover(error::return_error);
 
     warp::serve(routes).run(([127, 0, 0, 1], 8080)).await
 }
