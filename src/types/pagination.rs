@@ -1,13 +1,22 @@
-use handle_errors::Error;
 use crate::store::Store;
+use handle_errors::Error;
 use std::collections::HashMap;
 
+/// Pagination struct that is getting extracted
+/// from quey params
 #[derive(Debug)]
 pub struct Pagination {
+    /// The index of the first question to be returned
     pub start: usize,
+    /// The index of the last question to be returned
     pub end: usize,
 }
 
+/// Extract query parameters from the `/questions` route
+/// Example query
+/// GET requests to this route can have a pagination attached so we just
+/// return the questions we need
+/// `/questions?start=0&end=1`
 pub async fn extract_pagination(
     params: HashMap<String, String>,
     store: Store,
@@ -26,6 +35,7 @@ pub async fn extract_pagination(
                 .parse::<usize>()
                 .map_err(Error::ParseError)?,
         };
+        // Check against store size for correctness of start and end parameters
         if pagination.start > store_size || pagination.end > store_size {
             // println!("{}, {}", pagination.end, params.len());
             return Err(Error::OutOfBounds);
