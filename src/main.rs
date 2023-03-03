@@ -9,6 +9,12 @@ mod types;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
+    log::warn!("this is just a warning");
+    log::info!("this is just info");
+    log::error!("Algo malio sal");
+
     let cors = warp::cors()
         .allow_any_origin()
         .allow_header("content-type")
