@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use crate::error::Error;
+use handle_errors::Error;
 use crate::store::Store;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Pagination {
