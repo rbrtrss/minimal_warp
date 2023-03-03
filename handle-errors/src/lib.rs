@@ -41,8 +41,18 @@ pub async fn return_error(r: Rejection) -> Result<impl Reply, Rejection> {
     if let Some(error) = r.find::<Error>() {
         Ok(warp::reply::with_status(
             error.to_string(),
-            StatusCode::INTERNAL_SERVER_ERROR,
+            StatusCode::BAD_REQUEST,
         ))
+    // } else if let Some(error) = r.find::<Error::MissingParameters>() {
+    //     Ok(warp::reply::with_status(
+    //         error.to_string(),
+    //         StatusCode::BAD_REQUEST,
+    //     ))
+    // } else if let Some(error) = r.find::<Error::OutOfBounds>() {
+    //     Ok(warp::reply::with_status(
+    //         error.to_string(),
+    //         StatusCode::BAD_REQUEST,
+    //     ))    
     } else if let Some(error) = r.find::<CorsForbidden>() {
         Ok(warp::reply::with_status(
             error.to_string(),

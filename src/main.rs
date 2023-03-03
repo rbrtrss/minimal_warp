@@ -9,11 +9,25 @@ mod types;
 
 #[tokio::main]
 async fn main() {
-    env_logger::init();
+    // env_logger::init();
+    log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
 
     log::warn!("this is just a warning");
     log::info!("this is just info");
     log::error!("Algo malio sal");
+
+    let log = warp::log::custom(|info| {
+        // Use a log macro, or slog, or println, or whatever!
+        eprintln!(
+            "{} {} {} {:?} from {} with {:?}",
+            info.method(),
+            info.path(),
+            info.status(),
+            info.elapsed(),
+            info.remote_addr().unwrap(),
+            info.request_headers()
+        );
+    });
 
     let cors = warp::cors()
         .allow_any_origin()
@@ -66,6 +80,7 @@ async fn main() {
         .or(delete_questions)
         .or(add_answer)
         .with(cors)
+        .with(log)
         .recover(return_error);
 
     warp::serve(routes).run(([127, 0, 0, 1], 8080)).await

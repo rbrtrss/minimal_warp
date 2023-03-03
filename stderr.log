@@ -1,0 +1,32 @@
+2023-03-03T13:16:05.426471066-03:00 - this is just a warning
+2023-03-03T13:16:05.426693039-03:00 - this is just info
+2023-03-03T13:16:05.426770427-03:00 - Algo malio sal
+2023-03-03T13:16:05.427286730-03:00 - Server::run; addr=127.0.0.1:8080
+2023-03-03T13:16:05.427398756-03:00 - listening on http://127.0.0.1:8080
+2023-03-03T13:23:05.346648614-03:00 - parsed 6 headers
+2023-03-03T13:23:05.348206784-03:00 - incoming body is empty
+2023-03-03T13:23:05.351949382-03:00 - flushed 159 bytes
+2023-03-03T13:23:25.190401777-03:00 - parsed 6 headers
+2023-03-03T13:23:25.191174666-03:00 - incoming body is empty
+2023-03-03T13:23:25.191908946-03:00 - route was called without a query string, defaulting to empty
+2023-03-03T13:23:25.192179411-03:00 - flushed 179 bytes
+2023-03-03T13:51:19.348637292-03:00 - this is just a warning
+2023-03-03T13:51:19.374754570-03:00 - this is just info
+2023-03-03T13:51:19.375015496-03:00 - Algo malio sal
+2023-03-03T13:51:19.375464782-03:00 - Server::run; addr=127.0.0.1:8080
+2023-03-03T13:51:19.375633747-03:00 - listening on http://127.0.0.1:8080
+2023-03-03T13:59:06.462327831-03:00 - this is just a warning
+2023-03-03T13:59:06.479189065-03:00 - this is just info
+2023-03-03T13:59:06.479578731-03:00 - Algo malio sal
+2023-03-03T13:59:06.479884281-03:00 - Server::run; addr=127.0.0.1:8080
+2023-03-03T13:59:06.480367582-03:00 - listening on http://127.0.0.1:8080
+{"time":"2023-03-03T14:14:30.625985015-03:00","message":"this is just a warning","module_path":"minimal_warp","file":"src/main.rs","line":15,"level":"WARN","target":"minimal_warp","thread":"main","thread_id":140354172034688,"mdc":{}}
+{"time":"2023-03-03T14:14:30.627095291-03:00","message":"this is just info","module_path":"minimal_warp","file":"src/main.rs","line":16,"level":"INFO","target":"minimal_warp","thread":"main","thread_id":140354172034688,"mdc":{}}
+{"time":"2023-03-03T14:14:30.627347877-03:00","message":"Algo malio sal","module_path":"minimal_warp","file":"src/main.rs","line":17,"level":"ERROR","target":"minimal_warp","thread":"main","thread_id":140354172034688,"mdc":{}}
+{"time":"2023-03-03T14:14:30.631128776-03:00","message":"Server::run; addr=127.0.0.1:8080","module_path":"warp::server","file":"/home/roberto/.cargo/registry/src/github.com-1ecc6299db9ec823/warp-0.3.3/src/server.rs","line":133,"level":"INFO","target":"warp::server","thread":"main","thread_id":140354172034688,"mdc":{}}
+{"time":"2023-03-03T14:14:30.631648165-03:00","message":"listening on http://127.0.0.1:8080","module_path":"warp::server","file":"/home/roberto/.cargo/registry/src/github.com-1ecc6299db9ec823/warp-0.3.3/src/server.rs","line":134,"level":"INFO","target":"warp::server","thread":"main","thread_id":140354172034688,"mdc":{}}
+{"time":"2023-03-03T14:35:06.384609232-03:00","message":"this is just a warning","module_path":"minimal_warp","file":"src/main.rs","line":15,"level":"WARN","target":"minimal_warp","thread":"main","thread_id":139881380335232,"mdc":{}}
+{"time":"2023-03-03T14:35:06.429550715-03:00","message":"this is just info","module_path":"minimal_warp","file":"src/main.rs","line":16,"level":"INFO","target":"minimal_warp","thread":"main","thread_id":139881380335232,"mdc":{}}
+{"time":"2023-03-03T14:35:06.429618234-03:00","message":"Algo malio sal","module_path":"minimal_warp","file":"src/main.rs","line":17,"level":"ERROR","target":"minimal_warp","thread":"main","thread_id":139881380335232,"mdc":{}}
+{"time":"2023-03-03T14:35:06.466849245-03:00","message":"Server::run; addr=127.0.0.1:8080","module_path":"warp::server","file":"/home/roberto/.cargo/registry/src/github.com-1ecc6299db9ec823/warp-0.3.3/src/server.rs","line":133,"level":"INFO","target":"warp::server","thread":"main","thread_id":139881380335232,"mdc":{}}
+{"time":"2023-03-03T14:35:06.466960059-03:00","message":"listening on http://127.0.0.1:8080","module_path":"warp::server","file":"/home/roberto/.cargo/registry/src/github.com-1ecc6299db9ec823/warp-0.3.3/src/server.rs","line":134,"level":"INFO","target":"warp::server","thread":"main","thread_id":139881380335232,"mdc":{}}

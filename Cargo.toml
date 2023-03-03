@@ -13,3 +13,4 @@ serde_json = "1.0"
 handle-errors = { path="handle-errors", version="0.1.0" }
 log = "0.4"
 env_logger = "0.9"
+log4rs = "1.0"
