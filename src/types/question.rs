@@ -8,16 +8,5 @@ pub struct Question {
     pub tags: Option<Vec<String>>,
 }
 
-// impl Question {
-//     fn new(id: QuestionId, title: String, content: String, tags: Option<Vec<String>>) -> Self {
-//         Question {
-//             id,
-//             title,
-//             content,
-//             tags,
-//         }
-//     }
-// }
-
 #[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone)]
-pub struct QuestionId(pub String);
+pub struct QuestionId(pub i32);

@@ -3,6 +3,7 @@
 use handle_errors::return_error;
 use warp::{http::Method, Filter};
 use tracing_subscriber::fmt::format::FmtSpan;
+use dotenv;
 
 mod routes;
 mod store;
@@ -10,6 +11,8 @@ mod types;
 
 #[tokio::main]
 async fn main() {
+    // dotenv::dotenv().ok();
+    let db_uri = dotenv::var("DB_CONNECTION").unwrap().as_str();
     // env_logger::init();
     // // former version
     // log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
@@ -44,7 +47,8 @@ async fn main() {
         .allow_header("content-type")
         .allow_methods(&[Method::PUT, Method::POST, Method::GET, Method::DELETE]);
 
-    let store = store::Store::new();
+    // let store = store::Store::new();
+    let store = store::Store::new(db_uri).await;
     let store_filter = warp::any().map(move || store.clone());
 
     // let id_filter = warp::any().map(|| uuid::Uuid::new_v4().to_string());
@@ -74,7 +78,8 @@ async fn main() {
 
     let update_questions = warp::put()
         .and(warp::path("questions"))
-        .and(warp::path::param::<String>())
+        .and(warp::path::param::<i32>())
+        // .and(warp::path::param::<String>())
         .and(warp::path::end())
         .and(store_filter.clone())
         .and(warp::body::json())
@@ -82,7 +87,8 @@ async fn main() {
 
     let delete_questions = warp::delete()
         .and(warp::path("questions"))
-        .and(warp::path::param::<String>())
+        .and(warp::path::param::<i32>())
+        // .and(warp::path::param::<String>())
         .and(warp::path::end())
         .and(store_filter.clone())
         .and_then(routes::question::delete_question);

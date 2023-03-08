@@ -3,6 +3,8 @@ use warp::{
     Reply,
 };
 
+use sqlx::error::Error as SqlxError;
+
 #[derive(Debug)]
 pub enum Error {
     ParseError(std::num::ParseIntError),
@@ -10,26 +12,30 @@ pub enum Error {
     OutOfBounds,
     WrongRange,
     QuestionNotFound,
+    DatabaseQueryError(SqlxError),
 }
 
 impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &*self {
             Error::ParseError(ref err) => {
                 write!(f, "Cannot parse parameters {}", err)
-            }
+            },
             Error::MissingParameters => {
                 write!(f, "Missing parameter")
-            }
+            },
             Error::OutOfBounds => {
                 write!(f, "Requested index are out of bounds")
-            }
+            },
             Error::WrongRange => {
                 write!(f, "Wrong range")
-            }
+            },
             Error::QuestionNotFound => {
                 write!(f, "Question does not exist")
-            }
+            },
+            Error::DatabaseQueryError => {
+                write!(f, "Query could not be executed", e)
+            },
         }
     }
 }
