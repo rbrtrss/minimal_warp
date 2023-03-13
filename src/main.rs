@@ -1,9 +1,9 @@
 #![warn(clippy::all)]
 
-use handle_errors::return_error;
-use warp::{http::Method, Filter};
-use tracing_subscriber::fmt::format::FmtSpan;
 use dotenv;
+use handle_errors::return_error;
+use tracing_subscriber::fmt::format::FmtSpan;
+use warp::{http::Method, Filter};
 
 mod routes;
 mod store;
@@ -21,8 +21,8 @@ async fn main() {
     // log::info!("this is just info");
     // log::error!("Algo malio sal");
 
-    let log_filter = std::env::var("RUST_LOG")
-        .unwrap_or_else(|_| "minimal_warp=info,warp=error".to_owned());
+    let log_filter =
+        std::env::var("RUST_LOG").unwrap_or_else(|_| "minimal_warp=info,warp=error".to_owned());
 
     tracing_subscriber::fmt()
         .with_env_filter(log_filter)

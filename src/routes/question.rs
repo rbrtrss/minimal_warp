@@ -1,12 +1,13 @@
 use crate::store::Store;
+use crate::types::pagination::Pagination;
 use crate::types::{
     pagination::extract_pagination,
     question::{Question, QuestionId},
 };
 use handle_errors::Error;
 use std::collections::HashMap;
+use tracing::{event, info, instrument, Level};
 use warp::{http::StatusCode, Rejection, Reply};
-use tracing::{instrument, info};
 
 #[instrument]
 pub async fn get_questions(
@@ -14,41 +15,22 @@ pub async fn get_questions(
     store: Store,
     // id: String,
 ) -> Result<impl Reply, Rejection> {
-    info!("Start querying questions");
+    event!(target: "practical_rust_book", Level::INFO, "queriying questions");
+    let mut pagination = Pagination::default();
+
     if !params.is_empty() {
-        let pagination = extract_pagination(params, store.clone()).await?;
-        info!(pagination = true);
-        let res: Vec<Question> = store.questions.read().await.values().cloned().collect();
-        let res = &res[pagination.start..pagination.end];
-        Ok(warp::reply::json(&res))
-    } else {
-        info!(pagination = false);
-        let res: Vec<Question> = store.questions.read().await.values().cloned().collect();
-        Ok(warp::reply::json(&res))
+        event!(Level::INFO, pagination = true);
+        pagination = extract_pagination(params)?;
     }
-    // let question = Question::new(
-    //     QuestionId::from_str("1").expect("No id provided"),
-    //     "First Question".to_string(),
-    //     "Content of question".to_string(),
-    //     Some(vec!["faq".to_string()]),
-    // );
-
-    // match question.id.0.parse::<i32>() {
-    //     Err(_) => Err(warp::reject::custom(InvalidId)),
-    //     Ok(_) => Ok(warp::reply::json(&question)),
-    // }
-    // let mut start = 0;
-    // match params.get("start") {
-    //     Some(start) => println!("{}", start),
-    //     None => println!("No starting value")
-    // }
-    // if let Some(n) = params.get("start") {
-    //     start = n.parse::<usize>().expect("cannot parse start")
-    // }
-
-    // println!("{}", start);
-    // let res: Vec<Question> = store.questions.values().cloned().collect();
-    // Ok(warp::reply::json(&res))
+    info!(pagination = false);
+    let res: Vec<Question> = match store
+        .get_questions(pagination.limit, pagination.offset)
+        .await
+    {
+        Ok(res) => res,
+        Err(e) => return Err(warp::reject::custom(Error::DatabaseQueryError)),
+    };
+    Ok(warp::reply::json(&res))
 }
 
 pub async fn add_question(store: Store, question: Question) -> Result<impl Reply, Rejection> {

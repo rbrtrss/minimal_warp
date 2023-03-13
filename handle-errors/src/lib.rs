@@ -3,7 +3,8 @@ use warp::{
     Reply,
 };
 
-use sqlx::error::Error as SqlxError;
+// use sqlx::error::Error as SqlxError;
+// Commented because going to implement a normal error
 
 #[derive(Debug)]
 pub enum Error {
@@ -12,7 +13,8 @@ pub enum Error {
     OutOfBounds,
     WrongRange,
     QuestionNotFound,
-    DatabaseQueryError(SqlxError),
+    // DatabaseQueryError(SqlxError),
+    DatabaseQueryError,
 }
 
 impl std::fmt::Display for Error {
@@ -34,7 +36,7 @@ impl std::fmt::Display for Error {
                 write!(f, "Question does not exist")
             },
             Error::DatabaseQueryError => {
-                write!(f, "Query could not be executed", e)
+                write!(f, "Query could not be executed")
             },
         }
     }

@@ -1,15 +1,14 @@
-use crate::store::Store;
 use handle_errors::Error;
 use std::collections::HashMap;
 
 /// Pagination struct that is getting extracted
 /// from quey params
-#[derive(Debug)]
+#[derive(Default, Debug)]
 pub struct Pagination {
     /// The index of the first question to be returned
-    pub start: usize,
+    pub limit: Option<u32>,
     /// The index of the last question to be returned
-    pub end: usize,
+    pub offset: u32,
 }
 
 /// Extract query parameters from the `/questions` route
@@ -17,33 +16,33 @@ pub struct Pagination {
 /// GET requests to this route can have a pagination attached so we just
 /// return the questions we need
 /// `/questions?start=0&end=1`
-pub async fn extract_pagination(
-    params: HashMap<String, String>,
-    store: Store,
-) -> Result<Pagination, Error> {
-    let store_size = store.questions.read().await.len();
-    if params.contains_key("start") && params.contains_key("end") {
-        let pagination = Pagination {
-            start: params
-                .get("start")
+/// # Example usage
+/// ```rust
+/// use std::collections::HashMap;
+///
+/// let mut query = HashMap::new();
+/// query.insert("limit".to_string(), "1".to_string());
+/// query.insert("offset".to_string(), "10".to_string());
+/// let p = pagination::extract_pagination(query).unwrap();
+/// assert_eq!(p.limit, Some(1));
+/// assert_eq!(p.offset, 10);
+/// ```
+pub fn extract_pagination(params: HashMap<String, String>) -> Result<Pagination, Error> {
+    if params.contains_key("limit") && params.contains_key("offset") {
+        return Ok(Pagination {
+            limit: Some(
+                params
+                    .get("limit")
+                    .unwrap()
+                    .parse::<u32>()
+                    .map_err(Error::ParseError)?,
+            ),
+            offset: params
+                .get("offset")
                 .unwrap()
-                .parse::<usize>()
+                .parse::<u32>()
                 .map_err(Error::ParseError)?,
-            end: params
-                .get("end")
-                .unwrap()
-                .parse::<usize>()
-                .map_err(Error::ParseError)?,
-        };
-        // Check against store size for correctness of start and end parameters
-        if pagination.start > store_size || pagination.end > store_size {
-            // println!("{}, {}", pagination.end, params.len());
-            return Err(Error::OutOfBounds);
-        } else if pagination.start > pagination.end {
-            return Err(Error::WrongRange);
-        } else {
-            return Ok(pagination);
-        }
+        });
     }
     Err(Error::MissingParameters)
 }
