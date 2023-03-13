@@ -4,6 +4,7 @@
 
 use sqlx::postgres::{PgPoolOptions, PgPool, PgRow};
 use sqlx::Row;
+use handle_errors::Error;
 
 use crate::types::{
     answer::{Answer, AnswerId},
@@ -46,7 +47,7 @@ impl Store {
                 Ok(questions) => Ok(questions),
                 Err(e) => {
                     tracing::event!(tracing::Level::ERROR, "{:?}", e);
-                    Err(Error::DatabaseQueryError)
+                    Err(Error::DatabaseQueryError(_))
                 }
         }
     }
