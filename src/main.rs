@@ -14,6 +14,7 @@ async fn main() {
     // dotenv::dotenv().ok();
     let db_string = dotenv::var("DB_CONNECTION").unwrap();
     let db_uri = &db_string.as_str();
+    println!("{}", db_uri);
     // env_logger::init();
     // // former version
     // log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
@@ -60,15 +61,15 @@ async fn main() {
         .and(warp::query())
         .and(store_filter.clone())
         // .and(id_filter)
-        .and_then(routes::question::get_questions)
-        .with(warp::trace(|info| {
-            tracing::info_span!(
-                "get questions request",
-                method = %info.method(),
-                path = %info.path(),
-                id = %uuid::Uuid::new_v4(),
-            )
-        }));
+        .and_then(routes::question::get_questions);
+        // .with(warp::trace(|info| {
+        //     tracing::info_span!(
+        //         "get questions request",
+        //         method = %info.method(),
+        //         path = %info.path(),
+        //         id = %uuid::Uuid::new_v4(),
+        //     )
+        // }));
 
     let add_questions = warp::post()
         .and(warp::path("questions"))

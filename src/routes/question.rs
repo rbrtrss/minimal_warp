@@ -2,7 +2,7 @@ use crate::store::Store;
 use crate::types::pagination::Pagination;
 use crate::types::{
     pagination::extract_pagination,
-    question::{Question, QuestionId, NewQuestion},
+    question::{Question, NewQuestion},
 };
 use handle_errors::Error;
 use std::collections::HashMap;

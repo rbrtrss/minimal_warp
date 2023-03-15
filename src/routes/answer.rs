@@ -1,7 +1,6 @@
 use crate::store::Store;
 use crate::types::{
-    answer::{Answer, AnswerId, NewAnswer},
-    question::QuestionId,
+    answer::NewAnswer,
 };
 use warp::{http::StatusCode, Rejection, Reply};
 

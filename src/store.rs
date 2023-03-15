@@ -7,7 +7,6 @@ use sqlx::postgres::{PgPool, PgPoolOptions, PgRow};
 use sqlx::Row;
 use tracing::{event, Level};
 
-use crate::routes::question;
 use crate::types::answer::NewAnswer;
 use crate::types::question::NewQuestion;
 use crate::types::{
