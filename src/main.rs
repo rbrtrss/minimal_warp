@@ -12,7 +12,8 @@ mod types;
 #[tokio::main]
 async fn main() {
     // dotenv::dotenv().ok();
-    let db_uri = dotenv::var("DB_CONNECTION").unwrap().as_str();
+    let db_string = dotenv::var("DB_CONNECTION").unwrap();
+    let db_uri = &db_string.as_str();
     // env_logger::init();
     // // former version
     // log4rs::init_file("log4rs.yaml", Default::default()).unwrap();

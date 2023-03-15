@@ -1,28 +1,19 @@
 use crate::store::Store;
 use crate::types::{
-    answer::{Answer, AnswerId},
+    answer::{Answer, AnswerId, NewAnswer},
     question::QuestionId,
 };
-use std::collections::HashMap;
 use warp::{http::StatusCode, Rejection, Reply};
 
 pub async fn add_answer(
     store: Store,
-    params: HashMap<String, String>,
+    new_answer: NewAnswer,
 ) -> Result<impl Reply, Rejection> {
-    let answer = Answer {
-        id: AnswerId(1),
-        // id: AnswerId("1".to_string()),
-        content: params.get("content").unwrap().to_string(),
-        question_id: QuestionId(params.get("questionId").unwrap().parse::<i32>().unwrap()),
-        // question_id: QuestionId(params.get("questionId").unwrap().to_string()),
-    };
-
-    store
-        .answers
-        .write()
-        .await
-        .insert(answer.id.clone(), answer);
-
-    Ok(warp::reply::with_status("Answer added", StatusCode::OK))
+    match store.add_answer(new_answer).await {
+        Ok(_) => Ok(warp::reply::with_status(
+            "Answer added",
+            StatusCode::OK)
+        ),
+        Err(e) => return Err(warp::reject::custom(e)),
+    }
 }
